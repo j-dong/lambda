@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum LambdaExpr {
     Variable(String),
@@ -11,6 +13,28 @@ impl LambdaExpr {
             &LambdaExpr::Variable(ref v) => v == var,
             &LambdaExpr::Apply(ref e1, ref e2) => e1.contains(var) || e2.contains(var),
             &LambdaExpr::Lambda(ref v, ref e) => v != var && e.contains(var),
+        }
+    }
+}
+
+struct Parenthesized<'a>(&'a LambdaExpr);
+
+impl <'a> fmt::Display for Parenthesized<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        let &Parenthesized(expr) = self;
+        match expr {
+            &LambdaExpr::Apply(_, _) => write!(f, "({})", expr),
+            _ => write!(f, "{}", expr),
+        }
+    }
+}
+
+impl fmt::Display for LambdaExpr {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        match self {
+            &LambdaExpr::Variable(ref v) => write!(f, "{}", v),
+            &LambdaExpr::Apply(ref e1, ref e2) => write!(f, "{} {}", e1, Parenthesized(&*e2)),
+            &LambdaExpr::Lambda(ref v, ref e) => write!(f, "λ{} {}", v, e),
         }
     }
 }
@@ -172,5 +196,35 @@ mod tests {
                                                                 Box::new(Variable("f".to_string())))),
                                                         Box::new(Variable("x".to_string())))))))))))))),
                 parse("\\m \\n \\f \\x m f (n f x)"));
+    }
+
+    #[test]
+    fn display_single_variable() {
+        assert_eq!("x", format!("{}", parse("x").unwrap()));
+    }
+
+    #[test]
+    fn display_single_lambda() {
+        assert_eq!("λx x", format!("{}", parse("\\x x").unwrap()));
+    }
+
+    #[test]
+    fn display_single_parenthesis() {
+        assert_eq!("x", format!("{}", parse("(x)").unwrap()));
+    }
+
+    #[test]
+    fn display_single_application() {
+        assert_eq!("x y", format!("{}", parse("x y").unwrap()));
+    }
+
+    #[test]
+    fn display_parenthesis() {
+        assert_eq!("w x (y z)", format!("{}", parse("(w x) (y z)").unwrap()));
+    }
+
+    #[test]
+    fn display_church_add() {
+        assert_eq!("λm λn λf λx m f (n f x)", format!("{}", parse("\\m \\n \\f \\x m f (n f x)").unwrap()));
     }
 }
