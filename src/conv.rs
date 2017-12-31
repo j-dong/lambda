@@ -110,6 +110,17 @@ impl IntExpr {
             e => e
         }
     }
+
+    fn display_lambda(&self) -> LambdaExpr {
+        match self {
+            &IntExpr::Variable(ref v) => LambdaExpr::Variable(v.clone()),
+            &IntExpr::Apply(ref e1, ref e2) => LambdaExpr::Apply(Box::new(e1.display_lambda()), Box::new(e2.display_lambda())),
+            &IntExpr::Lambda(ref v, ref e) => LambdaExpr::Lambda(v.clone(), Box::new(e.display_lambda())),
+            &IntExpr::S => LambdaExpr::Variable("S".to_string()),
+            &IntExpr::K => LambdaExpr::Variable("K".to_string()),
+            &IntExpr::I => LambdaExpr::Variable("I".to_string()),
+        }
+    }
 }
 
 impl SKIExpr {
@@ -127,20 +138,17 @@ impl SKIExpr {
             l @ IntExpr::Lambda(_, _) => Err(format!("untranslated lambda: {:?}", l)),
         }
     }
+}
 
-    fn display_lambda(&self) -> LambdaExpr {
-        match self {
-            &SKIExpr::Apply(ref e1, ref e2) => LambdaExpr::Apply(Box::new(e1.display_lambda()), Box::new(e2.display_lambda())),
-            &SKIExpr::S => LambdaExpr::Variable("S".to_string()),
-            &SKIExpr::K => LambdaExpr::Variable("K".to_string()),
-            &SKIExpr::I => LambdaExpr::Variable("I".to_string()),
-        }
+impl fmt::Display for IntExpr {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        write!(fmt, "{}", self.display_lambda())
     }
 }
 
 impl fmt::Display for SKIExpr {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(fmt, "{}", self.display_lambda())
+        write!(fmt, "{}", IntExpr::from(self.clone()).display_lambda())
     }
 }
 
