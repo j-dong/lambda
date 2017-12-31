@@ -1,20 +1,10 @@
 use std::fmt;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum LambdaExpr {
     Variable(String),
     Apply(Box<LambdaExpr>, Box<LambdaExpr>),
     Lambda(String, Box<LambdaExpr>),
-}
-
-impl LambdaExpr {
-    fn contains(&self, var: &str) -> bool {
-        match self {
-            &LambdaExpr::Variable(ref v) => v == var,
-            &LambdaExpr::Apply(ref e1, ref e2) => e1.contains(var) || e2.contains(var),
-            &LambdaExpr::Lambda(ref v, ref e) => v != var && e.contains(var),
-        }
-    }
 }
 
 struct Parenthesized<'a>(&'a LambdaExpr);
