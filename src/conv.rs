@@ -135,7 +135,7 @@ impl SKIExpr {
             IntExpr::K => Ok(SKIExpr::K),
             IntExpr::I => Ok(SKIExpr::I),
             IntExpr::Variable(v) => Err(format!("free variable: {}", v)),
-            l @ IntExpr::Lambda(_, _) => Err(format!("untranslated lambda: {:?}", l)),
+            l @ IntExpr::Lambda(_, _) => Err(format!("untranslated lambda: {}", l)),
         }
     }
 }
