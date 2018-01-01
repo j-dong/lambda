@@ -21,6 +21,10 @@ fn main() {
             eprintln!("error reading from stdin: {}", err);
             return;
         }
+        if line.len() == 0 {
+            // end of file
+            return;
+        }
         let line = line.trim();
         if line == "quit" {
             return;

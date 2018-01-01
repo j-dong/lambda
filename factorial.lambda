@@ -1,0 +1,22 @@
+(\y-comb
+    (\false
+        (\true
+            (\zero?
+                (\zero
+                    (\one
+                        (\pred
+                            (\mul
+
+\y-comb (\f \n
+    (zero? n)
+        one
+        (mul n (f (pred n))))
+
+                            ) (\m \n \f \x m (n f) x)
+                        ) (\n \f \x n (\g \h h (g f)) (\u x) (\u u))
+                    ) (\f \x f x)
+                ) (\f \x x)
+            ) (\n n (\x false) true)
+        ) (\a \b a)
+    ) (\a \b b)
+) (\f (\x f (x x)) (\x f (x x)))
