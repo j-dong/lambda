@@ -7,11 +7,22 @@ pub enum LambdaExpr {
     Lambda(String, Box<LambdaExpr>),
 }
 
-struct Parenthesized<'a>(&'a LambdaExpr);
+struct ParenthesizedLeft<'a>(&'a LambdaExpr);
+struct ParenthesizedRight<'a>(&'a LambdaExpr);
 
-impl <'a> fmt::Display for Parenthesized<'a> {
+impl <'a> fmt::Display for ParenthesizedLeft<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        let &Parenthesized(expr) = self;
+        let &ParenthesizedLeft(expr) = self;
+        match expr {
+            &LambdaExpr::Lambda(_, _) => write!(f, "({})", expr),
+            _ => write!(f, "{}", expr),
+        }
+    }
+}
+
+impl <'a> fmt::Display for ParenthesizedRight<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        let &ParenthesizedRight(expr) = self;
         match expr {
             &LambdaExpr::Apply(_, _) => write!(f, "({})", expr),
             _ => write!(f, "{}", expr),
@@ -23,7 +34,7 @@ impl fmt::Display for LambdaExpr {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match self {
             &LambdaExpr::Variable(ref v) => write!(f, "{}", v),
-            &LambdaExpr::Apply(ref e1, ref e2) => write!(f, "{} {}", e1, Parenthesized(&*e2)),
+            &LambdaExpr::Apply(ref e1, ref e2) => write!(f, "{} {}", ParenthesizedLeft(&*e1), ParenthesizedRight(&*e2)),
             &LambdaExpr::Lambda(ref v, ref e) => write!(f, "λ{} {}", v, e),
         }
     }
