@@ -1,4 +1,4 @@
-use lambda::LambdaExpr;
+use expr::lambda::LambdaExpr;
 
 impl LambdaExpr {
     fn contains(&self, var: &str) -> bool {
@@ -72,7 +72,7 @@ impl LambdaExpr {
 
 #[cfg(test)]
 mod tests {
-    use lambda::*;
+    use expr::lambda::*;
 
     #[test]
     fn replace_alpha() {

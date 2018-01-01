@@ -1,6 +1,6 @@
-use lambda::LambdaExpr;
-use ski::SKIExpr;
-use iota::IotaExpr;
+use expr::lambda::LambdaExpr;
+use expr::ski::SKIExpr;
+use expr::iota::IotaExpr;
 
 use std::fmt;
 
@@ -204,8 +204,8 @@ impl fmt::Display for IotaExpr {
 
 #[cfg(test)]
 mod tests {
-    use conv::*;
-    use lambda;
+    use convert::*;
+    use expr::lambda;
 
     #[test]
     fn id_to_ski() {

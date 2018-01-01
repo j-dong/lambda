@@ -1,8 +1,6 @@
-mod lambda;
-mod ski;
-mod iota;
-mod conv;
-mod interpret;
+extern crate lambda;
+
+use lambda::expr;
 
 use std::io;
 use std::io::Write;
@@ -31,7 +29,7 @@ fn main() {
         if line == "quit" {
             return;
         }
-        let expr = match lambda::parse(line) {
+        let expr = match expr::lambda::parse(line) {
             Ok(x) => x,
             Err(err) => {
                 eprintln!("syntax error: {}", err);
@@ -39,7 +37,7 @@ fn main() {
             },
         };
         let expr_str = format!("{}", expr);
-        let iota = match ski::SKIExpr::from_lambda(expr).map(iota::IotaExpr::from) {
+        let iota = match expr::ski::SKIExpr::from_lambda(expr).map(expr::iota::IotaExpr::from) {
             Ok(x) => x,
             Err(err) => {
                 eprintln!("error converting to SKI: {}", err);

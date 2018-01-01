@@ -149,8 +149,8 @@ pub fn parse(s: &str) -> Result<LambdaExpr, String> {
 
 #[cfg(test)]
 mod tests {
-    use lambda::*;
-    use lambda::LambdaExpr::*;
+    use expr::lambda::*;
+    use expr::lambda::LambdaExpr::*;
 
     fn x() -> String {
         "x".to_string()
