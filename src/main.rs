@@ -32,7 +32,7 @@ fn main() {
                 continue
             },
         };
-        print!("{} => ", expr);
+        let expr_str = format!("{}", expr);
         let iota = match ski::SKIExpr::from_lambda(expr).map(iota::IotaExpr::from) {
             Ok(x) => x,
             Err(err) => {
@@ -40,6 +40,6 @@ fn main() {
                 continue
             }
         };
-        println!("{}", iota.to_string());
+        println!("{} => {}", expr_str, iota.to_string());
     }
 }
