@@ -2,6 +2,7 @@ mod lambda;
 mod ski;
 mod iota;
 mod conv;
+mod interpret;
 
 use std::io;
 use std::io::Write;
