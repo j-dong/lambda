@@ -1,5 +1,6 @@
 use lambda::LambdaExpr;
 use ski::SKIExpr;
+use iota::IotaExpr;
 
 use std::fmt;
 
@@ -152,6 +153,55 @@ impl fmt::Display for SKIExpr {
     }
 }
 
+impl From<IotaExpr> for SKIExpr {
+    fn from(expr: IotaExpr) -> SKIExpr {
+        // iota := S (S I (K S)) (K K)
+        match expr {
+            IotaExpr::Apply(e1, e2) => SKIExpr::Apply(Box::new(SKIExpr::from(*e1)), Box::new(SKIExpr::from(*e2))),
+            IotaExpr::Iota => SKIExpr::Apply(
+                Box::new(SKIExpr::Apply(
+                        Box::new(SKIExpr::S),
+                        Box::new(SKIExpr::Apply(
+                                Box::new(SKIExpr::Apply(Box::new(SKIExpr::S), Box::new(SKIExpr::I))),
+                                Box::new(SKIExpr::Apply(Box::new(SKIExpr::K), Box::new(SKIExpr::S))))))),
+                Box::new(SKIExpr::Apply(
+                        Box::new(SKIExpr::K),
+                        Box::new(SKIExpr::K)))),
+        }
+    }
+}
+
+impl From<SKIExpr> for IotaExpr {
+    fn from(expr: SKIExpr) -> IotaExpr {
+        match expr {
+            SKIExpr::Apply(e1, e2) => IotaExpr::Apply(Box::new(IotaExpr::from(*e1)), Box::new(IotaExpr::from(*e2))),
+            SKIExpr::S => IotaExpr::Apply(Box::new(IotaExpr::Iota),
+                    Box::new(IotaExpr::Apply(Box::new(IotaExpr::Iota),
+                        Box::new(IotaExpr::Apply(Box::new(IotaExpr::Iota),
+                            Box::new(IotaExpr::Apply(Box::new(IotaExpr::Iota), Box::new(IotaExpr::Iota)))))))),
+            SKIExpr::K => IotaExpr::Apply(Box::new(IotaExpr::Iota),
+                    Box::new(IotaExpr::Apply(Box::new(IotaExpr::Iota),
+                        Box::new(IotaExpr::Apply(Box::new(IotaExpr::Iota), Box::new(IotaExpr::Iota)))))),
+            SKIExpr::I => IotaExpr::Apply(Box::new(IotaExpr::Iota), Box::new(IotaExpr::Iota)),
+        }
+    }
+}
+
+impl IotaExpr {
+    fn display_lambda(&self) -> LambdaExpr {
+        match self {
+            &IotaExpr::Apply(ref e1, ref e2) => LambdaExpr::Apply(Box::new(e1.display_lambda()), Box::new(e2.display_lambda())),
+            &IotaExpr::Iota => LambdaExpr::Variable("ι".to_string()),
+        }
+    }
+}
+
+impl fmt::Display for IotaExpr {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        write!(fmt, "{}", self.display_lambda())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use conv::*;
@@ -170,5 +220,12 @@ mod tests {
     #[test]
     fn flip_to_ski() {
         assert_eq!("S (K (S I)) K", format!("{}", SKIExpr::from_lambda(lambda::parse("\\x \\y y x").unwrap()).unwrap()));
+    }
+
+    #[test]
+    fn ski_to_iota() {
+        assert_eq!("ι ι", format!("{}", IotaExpr::from(SKIExpr::I)));
+        assert_eq!("ι (ι (ι ι))", format!("{}", IotaExpr::from(SKIExpr::K)));
+        assert_eq!("ι (ι (ι (ι ι)))", format!("{}", IotaExpr::from(SKIExpr::S)));
     }
 }
