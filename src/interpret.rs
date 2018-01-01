@@ -29,9 +29,8 @@ impl LambdaExpr {
         }
     }
 
-    /// Performs beta-reduction on the first reducible term found
-    ///
-    /// Second element of tuple is false if no reduction performed
+    /// Performs beta-reduction on the first reducible term found.
+    /// Second element of tuple is false if no reduction performed.
     pub fn beta(self) -> (LambdaExpr, bool) {
         match self {
             LambdaExpr::Variable(v) => (LambdaExpr::Variable(v), false),
@@ -57,16 +56,19 @@ impl LambdaExpr {
         }
     }
 
-    pub fn repeated_beta(self, limit: u32) -> (LambdaExpr, bool) {
+    /// Performs beta reduction up to `limit` times.
+    /// Returns the number of times reduced.
+    /// Will only be `limit` if no normal form found.
+    pub fn repeated_beta(self, limit: u32) -> (LambdaExpr, u32) {
         let mut ret = self;
-        for _ in 0..limit {
+        for i in 0..limit {
             let (next, res) = ret.beta();
             if !res {
-                return (next, res)
+                return (next, i)
             }
             ret = next;
         }
-        (ret, true)
+        (ret, limit)
     }
 }
 
@@ -92,11 +94,11 @@ mod tests {
 
     #[test]
     fn beta_const() {
-        assert_eq!((parse("y").unwrap(), true), parse("(\\x \\y x) y x").unwrap().repeated_beta(2));
+        assert_eq!((parse("y").unwrap(), 2), parse("(\\x \\y x) y x").unwrap().repeated_beta(3));
     }
 
     #[test]
     fn beta_succ() {
-        assert_eq!((parse("\\f \\x f (f x)").unwrap(), false), parse("(\\n \\f \\x f (n f x)) (\\f \\x f x)").unwrap().repeated_beta(10));
+        assert_eq!((parse("\\f \\x f (f x)").unwrap(), 3), parse("(\\n \\f \\x f (n f x)) (\\f \\x f x)").unwrap().repeated_beta(10));
     }
 }
