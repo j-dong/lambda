@@ -1,7 +1,7 @@
 use expr::lambda::LambdaExpr;
 
 impl LambdaExpr {
-    fn contains(&self, var: &str) -> bool {
+    pub fn contains(&self, var: &str) -> bool {
         match self {
             &LambdaExpr::Variable(ref v) => v == var,
             &LambdaExpr::Apply(ref e1, ref e2) => e1.contains(var) || e2.contains(var),
@@ -9,7 +9,7 @@ impl LambdaExpr {
         }
     }
 
-    fn replace(self, param: &str, arg: &LambdaExpr) -> LambdaExpr {
+    pub fn replace(self, param: &str, arg: &LambdaExpr) -> LambdaExpr {
         match self {
             LambdaExpr::Variable(v) => if v == param { arg.clone() } else { LambdaExpr::Variable(v) },
             LambdaExpr::Apply(e1, e2) => LambdaExpr::Apply(Box::new(e1.replace(param, arg)), Box::new(e2.replace(param, arg))),
