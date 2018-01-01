@@ -7,7 +7,7 @@
                         (\pred
                             (\mul
 
-\y-comb (\f \n
+y-comb (\f \n
     (zero? n)
         one
         (mul n (f (pred n))))

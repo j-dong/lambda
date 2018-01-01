@@ -23,6 +23,7 @@ fn main() {
         }
         if line.len() == 0 {
             // end of file
+            println!();
             return;
         }
         let line = line.trim();
